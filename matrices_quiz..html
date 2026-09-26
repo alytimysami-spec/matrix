@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار قياس مستوى الطالب في وحدة المصفوفات والمحددات</title>
+    <!-- استدعاء خط عربي مريح للعين (Cairo) -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- إعدادات ومكتبة MathJax لعرض الرموز والمصفوفات الرياضية بشكل جميل -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --success-bg: #ecfdf5;
+            --success-text: #065f46;
+            --warning-bg: #fffbeb;
+            --warning-text: #92400e;
+            --error-bg: #fef2f2;
+            --error-text: #991b1b;
+        }
+
+        body {
+            font-family: 'Cairo', system-ui, -apple-system, sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 1.9rem;
+            margin: 0 0 10px 0;
+            font-weight: 700;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            margin: 0;
+            font-weight: 400;
+        }
+
+        .section-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+        }
+
+        .section-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 24px;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .question-box {
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px dashed var(--border);
+        }
+
+        .question-box:last-of-type {
+            border-bottom: none;
+            margin-bottom: 10px;
+            padding-bottom: 0;
+        }
+
+        .question-text {
+            font-weight: 600;
+            font-size: 1.15rem;
+            margin-bottom: 16px;
+            color: #334155;
+            line-height: 1.7;
+        }
+
+        .options-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        @media (max-width: 650px) {
+            .options-list {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            padding: 14px 18px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1.05rem;
+            font-weight: 500;
+        }
+
+        .option-label:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .option-label input {
+            margin-left: 14px;
+            accent-color: var(--primary);
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .option-label.correct {
+            background-color: #d1fae5 !important;
+            border-color: #10b981 !important;
+            color: #065f46;
+        }
+
+        .option-label.incorrect {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #991b1b;
+        }
+
+        .explanation-text {
+            margin-top: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #047857;
+            display: none;
+        }
+
+        .btn-submit, .btn-review {
+            display: block;
+            width: 100%;
+            border: none;
+            padding: 14px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            margin-top: 15px;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .btn-submit {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+        }
+
+        .btn-submit:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-review {
+            background-color: #0d9488;
+            color: white;
+            display: none;
+        }
+
+        .btn-review:hover {
+            background-color: #0f766e;
+        }
+
+        .feedback-box {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 12px;
+            font-weight: 500;
+            line-height: 1.8;
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+            font-size: 1.05rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .feedback-success {
+            background-color: var(--success-bg);
+            color: var(--success-text);
+            border: 1px solid #a7f3d0;
+        }
+
+        .feedback-warning {
+            background-color: var(--warning-bg);
+            color: var(--warning-text);
+            border: 1px solid #fde68a;
+        }
+
+        .feedback-error {
+            background-color: var(--error-bg);
+            color: var(--error-text);
+            border: 1px solid #fecaca;
+        }
+
+        .feedback-error ol {
+            margin: 10px 0 0 0;
+            padding-right: 20px;
+        }
+
+        .feedback-error li {
+            margin-bottom: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>اختبار قياس مستوى الطالب في وحدة المصفوفات والمحددات</h1>
+        <p>أجب عن الأسئلة التالية لاختبار فهمك وتدرجك المهاري بكل يسر وسهولة</p>
+    </header>
+
+    <!-- القسم الأول: أنواع المصفوفات -->
+    <div class="section-card" id="section-1">
+        <div class="section-title">
+            <span>📌</span> 1. أنواع المصفوفات
+        </div>
+        
+        <div class="question-box" data-q="1">
+            <div class="question-text">ما هي المصفوفة التي تتكون من صف واحد فقط؟</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q1"><span class="option-text">المصفوفة الصفية</span></label>
+                <label class="option-label"><input type="radio" name="q1"><span class="option-text">المصفوفة العمودية</span></label>
+                <label class="option-label"><input type="radio" name="q1"><span class="option-text">المصفوفة الصفرية</span></label>
+                <label class="option-label"><input type="radio" name="q1"><span class="option-text">المصفوفة المربعة</span></label>
+            </div>
+            <div class="explanation-text" id="exp-1"></div>
+        </div>
+
+        <div class="question-box" data-q="2">
+            <div class="question-text">ما هي المصفوفة التي تتكون من عمود واحد فقط؟</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q2"><span class="option-text">المصفوفة العمودية</span></label>
+                <label class="option-label"><input type="radio" name="q2"><span class="option-text">المصفوفة الصفرية</span></label>
+                <label class="option-label"><input type="radio" name="q2"><span class="option-text">المصفوفة المربعة</span></label>
+                <label class="option-label"><input type="radio" name="q2"><span class="option-text">المصفوفة القطرية</span></label>
+            </div>
+            <div class="explanation-text" id="exp-2"></div>
+        </div>
+
+        <div class="question-box" data-q="3">
+            <div class="question-text">ما هي المصفوفة التي جميع عناصرها أصفار؟</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q3"><span class="option-text">المصفوفة الصفرية</span></label>
+                <label class="option-label"><input type="radio" name="q3"><span class="option-text">المصفوفة المربعة</span></label>
+                <label class="option-label"><input type="radio" name="q3"><span class="option-text">المصفوفة القطرية</span></label>
+                <label class="option-label"><input type="radio" name="q3"><span class="option-text">مصفوفة الوحدة</span></label>
+            </div>
+            <div class="explanation-text" id="exp-3"></div>
+        </div>
+
+        <div class="question-box" data-q="4">
+            <div class="question-text">ما هي المصفوفة التي يكون فيها عدد الصفوف يساوي عدد الأعمدة؟</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q4"><span class="option-text">المصفوفة المربعة</span></label>
+                <label class="option-label"><input type="radio" name="q4"><span class="option-text">المصفوفة الصفية</span></label>
+                <label class="option-label"><input type="radio" name="q4"><span class="option-text">المصفوفة العمودية</span></label>
+                <label class="option-label"><input type="radio" name="q4"><span class="option-text">المصفوفة القطرية</span></label>
+            </div>
+            <div class="explanation-text" id="exp-4"></div>
+        </div>
+
+        <div class="question-box" data-q="5">
+            <div class="question-text">ما هي المصفوفة المربعة التي جميع عناصرها تساوي صفر عدا عناصر القطر الرئيسي تكون أي عدد؟</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q5"><span class="option-text">المصفوفة القطرية</span></label>
+                <label class="option-label"><input type="radio" name="q5"><span class="option-text">مصفوفة الوحدة</span></label>
+                <label class="option-label"><input type="radio" name="q5"><span class="option-text">المصفوفة الصفرية</span></label>
+                <label class="option-label"><input type="radio" name="q5"><span class="option-text">المصفوفة المربعة</span></label>
+            </div>
+            <div class="explanation-text" id="exp-5"></div>
+        </div>
+
+        <div class="question-box" data-q="6">
+            <div class="question-text">ما هي المصفوفة المربعة التي جميع عناصرها تساوي صفر عدا عناصر القطر الرئيسي تكون واحد؟</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q6"><span class="option-text">مصفوفة الوحدة</span></label>
+                <label class="option-label"><input type="radio" name="q6"><span class="option-text">المصفوفة القطرية</span></label>
+                <label class="option-label"><input type="radio" name="q6"><span class="option-text">المصفوفة الصفرية</span></label>
+                <label class="option-label"><input type="radio" name="q6"><span class="option-text">المصفوفة المربعة</span></label>
+            </div>
+            <div class="explanation-text" id="exp-6"></div>
+        </div>
+
+        <button class="btn-submit" onclick="checkSection(1, 1, 6)">تحقق من إجابات القسم الأول</button>
+        <button class="btn-review" id="btn-review-1" onclick="showReview(1, 1, 6)">مراجعة الأخطاء وتصحيحها</button>
+        <div class="feedback-box" id="feedback-1"></div>
+    </div>
+
+    <!-- القسم الثاني: رتبة المصفوفة -->
+    <div class="section-card" id="section-2">
+        <div class="section-title">
+            <span>📌</span> 2. رتبة المصفوفة
+        </div>
+        
+        <div class="question-box" data-q="7">
+            <div class="question-text">ما هي رتبة المصفوفة التالية؟ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\(\begin{bmatrix} 2 & 5 & 1 \\ 4 & 0 & -3 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q7"><span class="option-text">\(2 \times 3\)</span></label>
+                <label class="option-label"><input type="radio" name="q7"><span class="option-text">\(3 \times 2\)</span></label>
+                <label class="option-label"><input type="radio" name="q7"><span class="option-text">\(2 \times 2\)</span></label>
+                <label class="option-label"><input type="radio" name="q7"><span class="option-text">\(3 \times 3\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-7"></div>
+        </div>
+
+        <div class="question-box" data-q="8">
+            <div class="question-text">ما هي رتبة المصفوفة التالية؟ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\(\begin{bmatrix} 1 & -2 \\ 6 & 8 \\ 0 & 5 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q8"><span class="option-text">\(3 \times 2\)</span></label>
+                <label class="option-label"><input type="radio" name="q8"><span class="option-text">\(2 \times 3\)</span></label>
+                <label class="option-label"><input type="radio" name="q8"><span class="option-text">\(3 \times 3\)</span></label>
+                <label class="option-label"><input type="radio" name="q8"><span class="option-text">\(2 \times 2\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-8"></div>
+        </div>
+
+        <div class="question-box" data-q="9">
+            <div class="question-text">ما هي رتبة المصفوفة التالية؟ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\(\begin{bmatrix} 7 & -1 & 4 \\ 2 & 3 & 6 \\ 5 & 0 & -9 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q9"><span class="option-text">\(3 \times 3\)</span></label>
+                <label class="option-label"><input type="radio" name="q9"><span class="option-text">\(2 \times 2\)</span></label>
+                <label class="option-label"><input type="radio" name="q9"><span class="option-text">\(3 \times 2\)</span></label>
+                <label class="option-label"><input type="radio" name="q9"><span class="option-text">\(2 \times 3\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-9"></div>
+        </div>
+
+        <div class="question-box" data-q="10">
+            <div class="question-text">ما هي رتبة المصفوفة التالية؟ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\(\begin{bmatrix} -3 & 4 & 1 & 9 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q10"><span class="option-text">\(1 \times 4\)</span></label>
+                <label class="option-label"><input type="radio" name="q10"><span class="option-text">\(4 \times 1\)</span></label>
+                <label class="option-label"><input type="radio" name="q10"><span class="option-text">\(1 \times 1\)</span></label>
+                <label class="option-label"><input type="radio" name="q10"><span class="option-text">\(4 \times 4\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-10"></div>
+        </div>
+
+        <div class="question-box" data-q="11">
+            <div class="question-text">ما هي رتبة المصفوفة التالية؟ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\(\begin{bmatrix} 5 \\ -2 \\ 3 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q11"><span class="option-text">\(3 \times 1\)</span></label>
+                <label class="option-label"><input type="radio" name="q11"><span class="option-text">\(1 \times 3\)</span></label>
+                <label class="option-label"><input type="radio" name="q11"><span class="option-text">\(3 \times 3\)</span></label>
+                <label class="option-label"><input type="radio" name="q11"><span class="option-text">\(1 \times 1\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-11"></div>
+        </div>
+
+        <button class="btn-submit" onclick="checkSection(2, 7, 11)">تحقق من إجابات القسم الثاني</button>
+        <button class="btn-review" id="btn-review-2" onclick="showReview(2, 7, 11)">مراجعة الأخطاء وتصحيحها</button>
+        <div class="feedback-box" id="feedback-2"></div>
+    </div>
+
+    <!-- القسم الثالث: قيمة العنصر في المصفوفة -->
+    <div class="section-card" id="section-3">
+        <div class="section-title">
+            <span>📌</span> 3. قيمة العنصر في المصفوفة
+        </div>
+        
+        <div class="question-box" data-q="12">
+            <div class="question-text">إذا كانت المصفوفة \(A = \begin{bmatrix} 3 & -1 & 5 \\ 0 & 4 & 2 \end{bmatrix}\)، فما هي قيمة العنصر \(a_{21}\)؟</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q12"><span class="option-text">\(0\)</span></label>
+                <label class="option-label"><input type="radio" name="q12"><span class="option-text">\(3\)</span></label>
+                <label class="option-label"><input type="radio" name="q12"><span class="option-text">\(4\)</span></label>
+                <label class="option-label"><input type="radio" name="q12"><span class="option-text">\(-1\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-12"></div>
+        </div>
+
+        <div class="question-box" data-q="13">
+            <div class="question-text">إذا كانت المصفوفة \(B = \begin{bmatrix} 7 & 2 \\ -5 & 6 \\ 1 & 9 \end{bmatrix}\)، فما هي قيمة العنصر \(b_{32}\)؟</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q13"><span class="option-text">\(9\)</span></label>
+                <label class="option-label"><input type="radio" name="q13"><span class="option-text">\(1\)</span></label>
+                <label class="option-label"><input type="radio" name="q13"><span class="option-text">\(6\)</span></label>
+                <label class="option-label"><input type="radio" name="q13"><span class="option-text">\(-5\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-13"></div>
+        </div>
+
+        <div class="question-box" data-q="14">
+            <div class="question-text">إذا كانت المصفوفة \(C = \begin{bmatrix} 4 & 0 & -2 \\ 1 & 8 & 3 \\ 6 & -7 & 5 \end{bmatrix}\)، فما هي قيمة العنصر \(c_{23}\)؟</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q14"><span class="option-text">\(3\)</span></label>
+                <label class="option-label"><input type="radio" name="q14"><span class="option-text">\(8\)</span></label>
+                <label class="option-label"><input type="radio" name="q14"><span class="option-text">\(-2\)</span></label>
+                <label class="option-label"><input type="radio" name="q14"><span class="option-text">\(5\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-14"></div>
+        </div>
+
+        <div class="question-box" data-q="15">
+            <div class="question-text">إذا كانت المصفوفة \(D = \begin{bmatrix} -8 & 3 & 1 \\ 2 & 5 & -4 \end{bmatrix}\)، فما هي قيمة العنصر \(d_{13}\)؟</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q15"><span class="option-text">\(1\)</span></label>
+                <label class="option-label"><input type="radio" name="q15"><span class="option-text">\(3\)</span></label>
+                <label class="option-label"><input type="radio" name="q15"><span class="option-text">\(-4\)</span></label>
+                <label class="option-label"><input type="radio" name="q15"><span class="option-text">\(-8\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-15"></div>
+        </div>
+
+        <div class="question-box" data-q="16">
+            <div class="question-text">إذا كانت المصفوفة \(E = \begin{bmatrix} 9 & -6 \\ 4 & 0 \\ -1 & 2 \end{bmatrix}\)، فما هي قيمة العنصر \(e_{31}\)؟</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q16"><span class="option-text">\(-1\)</span></label>
+                <label class="option-label"><input type="radio" name="q16"><span class="option-text">\(2\)</span></label>
+                <label class="option-label"><input type="radio" name="q16"><span class="option-text">\(9\)</span></label>
+                <label class="option-label"><input type="radio" name="q16"><span class="option-text">\(4\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-16"></div>
+        </div>
+
+        <button class="btn-submit" onclick="checkSection(3, 12, 16)">تحقق من إجابات القسم الثالث</button>
+        <button class="btn-review" id="btn-review-3" onclick="showReview(3, 12, 16)">مراجعة الأخطاء وتصحيحها</button>
+        <div class="feedback-box" id="feedback-3"></div>
+    </div>
+
+    <!-- القسم الرابع: تساوي المصفوفات -->
+    <div class="section-card" id="section-4">
+        <div class="section-title">
+            <span>📌</span> 4. تساوي المصفوفات
+        </div>
+        
+        <div class="question-box" data-q="17">
+            <div class="question-text">هل المصفوفتان التاليتان متساويتان؟<br>\(\begin{bmatrix} 2 & 5 \\ 1 & 4 \end{bmatrix} \quad , \quad \begin{bmatrix} 2 & 1 \\ 5 & 4 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q17"><span class="option-text">لا</span></label>
+                <label class="option-label"><input type="radio" name="q17"><span class="option-text">نعم</span></label>
+                <label class="option-label"><input type="radio" name="q17"><span class="option-text">متطابقتان</span></label>
+                <label class="option-label"><input type="radio" name="q17"><span class="option-text">غير ذلك</span></label>
+            </div>
+            <div class="explanation-text" id="exp-17"></div>
+        </div>
+
+        <div class="question-box" data-q="18">
+            <div class="question-text">هل المصفوفتان التاليتان متساويتان؟<br>\(\begin{bmatrix} 3 & -2 & 4 \end{bmatrix} \quad , \quad \begin{bmatrix} 3 & -2 & 4 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q18"><span class="option-text">نعم</span></label>
+                <label class="option-label"><input type="radio" name="q18"><span class="option-text">لا</span></label>
+                <label class="option-label"><input type="radio" name="q18"><span class="option-text">غير معرفة</span></label>
+                <label class="option-label"><input type="radio" name="q18"><span class="option-text">متخالفتان</span></label>
+            </div>
+            <div class="explanation-text" id="exp-18"></div>
+        </div>
+
+        <div class="question-box" data-q="19">
+            <div class="question-text">كم قيمة \(x\) التي تجعل المصفوفتين التاليتين متساويتين؟<br>\(\begin{bmatrix} x & 4 \\ 2 & 7 \end{bmatrix} = \begin{bmatrix} 5 & 4 \\ 2 & 7 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q19"><span class="option-text">\(5\)</span></label>
+                <label class="option-label"><input type="radio" name="q19"><span class="option-text">\(4\)</span></label>
+                <label class="option-label"><input type="radio" name="q19"><span class="option-text">\(2\)</span></label>
+                <label class="option-label"><input type="radio" name="q19"><span class="option-text">\(7\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-19"></div>
+        </div>
+
+        <div class="question-box" data-q="20">
+            <div class="question-text">كم قيمة \(x\) التي تجعل المصفوفتين التاليتين متساويتين؟<br>\(\begin{bmatrix} 3 & 1 \\ x & 6 \end{bmatrix} = \begin{bmatrix} 3 & 1 \\ 4 & 6 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q20"><span class="option-text">\(4\)</span></label>
+                <label class="option-label"><input type="radio" name="q20"><span class="option-text">\(3\)</span></label>
+                <label class="option-label"><input type="radio" name="q20"><span class="option-text">\(6\)</span></label>
+                <label class="option-label"><input type="radio" name="q20"><span class="option-text">\(1\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-20"></div>
+        </div>
+
+        <div class="question-box" data-q="21">
+            <div class="question-text">كم قيمة \(x\) و \(y\) اللتين تجعلان المصفوفتين التاليتين متساويتين؟<br>\(\begin{bmatrix} x & 3 \\ 5 & y \end{bmatrix} = \begin{bmatrix} 4 & 3 \\ 5 & 8 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q21"><span class="option-text">\(x = 4, y = 8\)</span></label>
+                <label class="option-label"><input type="radio" name="q21"><span class="option-text">\(x = 3, y = 5\)</span></label>
+                <label class="option-label"><input type="radio" name="q21"><span class="option-text">\(x = 8, y = 4\)</span></label>
+                <label class="option-label"><input type="radio" name="q21"><span class="option-text">\(x = 5, y = 3\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-21"></div>
+        </div>
+
+        <button class="btn-submit" onclick="checkSection(4, 17, 21)">تحقق من إجابات القسم الرابع</button>
+        <button class="btn-review" id="btn-review-4" onclick="showReview(4, 17, 21)">مراجعة الأخطاء وتصحيحها</button>
+        <div class="feedback-box" id="feedback-4"></div>
+    </div>
+
+    <!-- القسم الخامس: جمع المصفوفات -->
+    <div class="section-card" id="section-5">
+        <div class="section-title">
+            <span>📌</span> 5. جمع المصفوفات
+        </div>
+        
+        <div class="question-box" data-q="22">
+            <div class="question-text">أوجد ناتج ما يلي:<br>\(\begin{bmatrix} 2 & 3 \\ 1 & 4 \end{bmatrix} + \begin{bmatrix} 5 & 1 & 2 \\ 0 & 3 & 6 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q22"><span class="option-text">لا يمكن الجمع</span></label>
+                <label class="option-label"><input type="radio" name="q22"><span class="option-text">\(\begin{bmatrix} 7 & 4 & 2 \\ 1 & 7 & 6 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q22"><span class="option-text">\(\begin{bmatrix} 7 & 3 \\ 1 & 10 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q22"><span class="option-text">\(\begin{bmatrix} 10 & 3 \\ 0 & 24 \end{bmatrix}\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-22"></div>
+        </div>
+
+        <div class="question-box" data-q="23">
+            <div class="question-text">أوجد ناتج ما يلي:<br>\(\begin{bmatrix} 3 & 1 \\ 4 & 2 \end{bmatrix} + \begin{bmatrix} 1 & 5 \\ 2 & 6 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q23"><span class="option-text">\(\begin{bmatrix} 4 & 6 \\ 6 & 8 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q23"><span class="option-text">\(\begin{bmatrix} 2 & -4 \\ 2 & -4 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q23"><span class="option-text">\(\begin{bmatrix} 3 & 5 \\ 8 & 12 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q23"><span class="option-text">\(\begin{bmatrix} 4 & 4 \\ 2 & 8 \end{bmatrix}\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-23"></div>
+        </div>
+
+        <div class="question-box" data-q="24">
+            <div class="question-text">أوجد ناتج ما يلي:<br>\(\begin{bmatrix} 5 & 0 & 2 \\ 1 & 3 & 4 \end{bmatrix} + \begin{bmatrix} 3 & 2 & 1 \\ 6 & -1 & 5 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q24"><span class="option-text">\(\begin{bmatrix} 8 & 2 & 3 \\ 7 & 2 & 9 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q24"><span class="option-text">\(\begin{bmatrix} 2 & -2 & 1 \\ -5 & 4 & -1 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q24"><span class="option-text">\(\begin{bmatrix} 8 & 2 & 1 \\ 7 & 4 & 9 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q24"><span class="option-text">\(\begin{bmatrix} 15 & 0 & 2 \\ 6 & -3 & 20 \end{bmatrix}\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-24"></div>
+        </div>
+
+        <div class="question-box" data-q="25">
+            <div class="question-text">أوجد ناتج ما يلي:<br>\(\begin{bmatrix} 7 & 2 \\ 3 & 5 \end{bmatrix} + \begin{bmatrix} 4 & 2 \\ -2 & -5 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q25"><span class="option-text">\(\begin{bmatrix} 11 & 4 \\ 1 & 0 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q25"><span class="option-text">\(\begin{bmatrix} 3 & 0 \\ 5 & 10 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q25"><span class="option-text">\(\begin{bmatrix} 11 & 0 \\ -1 & 10 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q25"><span class="option-text">\(\begin{bmatrix} 28 & 4 \\ -6 & -25 \end{bmatrix}\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-25"></div>
+        </div>
+
+        <div class="question-box" data-q="26">
+            <div class="question-text">أوجد ناتج ما يلي:<br>\(\begin{bmatrix} 1 & 2 & 3 \end{bmatrix} + \begin{bmatrix} 4 & 5 & 6 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q26"><span class="option-text">\(\begin{bmatrix} 5 & 7 & 9 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q26"><span class="option-text">\(\begin{bmatrix} 4 & 10 & 18 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q26"><span class="option-text">\(\begin{bmatrix} 5 & 2 & 3 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q26"><span class="option-text">\(\begin{bmatrix} 9 & 7 & 5 \end{bmatrix}\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-26"></div>
+        </div>
+
+        <button class="btn-submit" onclick="checkSection(5, 22, 26)">تحقق من إجابات القسم الخامس</button>
+        <button class="btn-review" id="btn-review-5" onclick="showReview(5, 22, 26)">مراجعة الأخطاء وتصحيحها</button>
+        <div class="feedback-box" id="feedback-5"></div>
+    </div>
+
+    <!-- القسم السادس: طرح المصفوفات -->
+    <div class="section-card" id="section-6">
+        <div class="section-title">
+            <span>📌</span> 6. طرح المصفوفات
+        </div>
+        
+        <div class="question-box" data-q="27">
+            <div class="question-text">أوجد ناتج ما يلي:<br>\(\begin{bmatrix} 5 & 2 \\ 3 & 1 \end{bmatrix} - \begin{bmatrix} 4 & 1 & 6 \\ 2 & 3 & 0 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q27"><span class="option-text">لا يمكن الطرح</span></label>
+                <label class="option-label"><input type="radio" name="q27"><span class="option-text">\(\begin{bmatrix} 1 & 1 \\ 1 & -2 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q27"><span class="option-text">\(\begin{bmatrix} 9 & 3 \\ 5 & 4 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q27"><span class="option-text">\(\begin{bmatrix} 1 & 2 \\ 3 & 1 \end{bmatrix}\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-27"></div>
+        </div>
+
+        <div class="question-box" data-q="28">
+            <div class="question-text">أوجد ناتج ما يلي:<br>\(\begin{bmatrix} 7 & 4 \\ 6 & 8 \end{bmatrix} - \begin{bmatrix} 3 & 1 \\ 2 & 5 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q28"><span class="option-text">\(\begin{bmatrix} 4 & 3 \\ 4 & 3 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q28"><span class="option-text">\(\begin{bmatrix} 10 & 5 \\ 8 & 13 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q28"><span class="option-text">\(\begin{bmatrix} 4 & 5 \\ 4 & 3 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q28"><span class="option-text">\(\begin{bmatrix} 3 & 4 \\ 3 & 4 \end{bmatrix}\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-28"></div>
+        </div>
+
+        <div class="question-box" data-q="29">
+            <div class="question-text">أوجد ناتج ما يلي:<br>\(\begin{bmatrix} 8 & 3 & 5 \\ 4 & 6 & 2 \end{bmatrix} - \begin{bmatrix} 2 & 1 & 4 \\ 3 & -1 & 1 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q29"><span class="option-text">\(\begin{bmatrix} 6 & 2 & 1 \\ 1 & 7 & 1 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q29"><span class="option-text">\(\begin{bmatrix} 10 & 4 & 9 \\ 7 & 5 & 3 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q29"><span class="option-text">\(\begin{bmatrix} 6 & 2 & 9 \\ 1 & 5 & 1 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q29"><span class="option-text">\(\begin{bmatrix} 6 & 4 & 1 \\ 1 & 7 & 3 \end{bmatrix}\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-29"></div>
+        </div>
+
+        <div class="question-box" data-q="30">
+            <div class="question-text">أوجد ناتج ما يلي:<br>\(\begin{bmatrix} 9 & 5 \\ 7 & 6 \end{bmatrix} - \begin{bmatrix} 3 & -2 \\ 4 & -1 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q30"><span class="option-text">\(\begin{bmatrix} 6 & 7 \\ 3 & 7 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q30"><span class="option-text">\(\begin{bmatrix} 12 & 3 \\ 11 & 5 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q30"><span class="option-text">\(\begin{bmatrix} 6 & 3 \\ 3 & 5 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q30"><span class="option-text">\(\begin{bmatrix} 6 & 7 \\ 11 & 7 \end{bmatrix}\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-30"></div>
+        </div>
+
+        <div class="question-box" data-q="31">
+            <div class="question-text">أوجد ناتج ما يلي:<br>\(\begin{bmatrix} 6 & 8 & 10 \end{bmatrix} - \begin{bmatrix} 2 & 3 & 5 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q31"><span class="option-text">\(\begin{bmatrix} 4 & 5 & 5 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q31"><span class="option-text">\(\begin{bmatrix} 8 & 11 & 15 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q31"><span class="option-text">\(\begin{bmatrix} 4 & 3 & 5 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q31"><span class="option-text">\(\begin{bmatrix} 3 & 5 & 2 \end{bmatrix}\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-31"></div>
+        </div>
+
+        <button class="btn-submit" onclick="checkSection(6, 27, 31)">تحقق من إجابات القسم السادس</button>
+        <button class="btn-review" id="btn-review-6" onclick="showReview(6, 27, 31)">مراجعة الأخطاء وتصحيحها</button>
+        <div class="feedback-box" id="feedback-6"></div>
+    </div>
+
+    <!-- القسم السابع: ضرب المصفوفة في عدد -->
+    <div class="section-card" id="section-7">
+        <div class="section-title">
+            <span>📌</span> 7. ضرب المصفوفة في عدد
+        </div>
+        
+        <div class="question-box" data-q="32">
+            <div class="question-text">أوجد ناتج ما يلي:<br>\(3 \begin{bmatrix} 2 & -1 \\ 4 & 5 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q32"><span class="option-text">\(\begin{bmatrix} 6 & -3 \\ 12 & 15 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q32"><span class="option-text">\(\begin{bmatrix} 5 & 2 \\ 7 & 8 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q32"><span class="option-text">\(\begin{bmatrix} 6 & -1 \\ 12 & 5 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q32"><span class="option-text">\(\begin{bmatrix} 2 & -3 \\ 4 & 15 \end{bmatrix}\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-32"></div>
+        </div>
+
+        <div class="question-box" data-q="33">
+            <div class="question-text">أوجد ناتج ما يلي:<br>\(-2 \begin{bmatrix} 3 & 0 & 4 \\ -1 & 2 & 6 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q33"><span class="option-text">\(\begin{bmatrix} -6 & 0 & -8 \\ 2 & -4 & -12 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q33"><span class="option-text">\(\begin{bmatrix} 1 & -2 & 2 \\ -3 & 0 & 4 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q33"><span class="option-text">\(\begin{bmatrix} -6 & 0 & 4 \\ 2 & 2 & -12 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q33"><span class="option-text">\(\begin{bmatrix} 6 & 0 & 8 \\ -2 & 4 & 12 \end{bmatrix}\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-33"></div>
+        </div>
+
+        <div class="question-box" data-q="34">
+            <div class="question-text">أوجد ناتج ما يلي:<br>\(4 \begin{bmatrix} 1 & 3 \\ -2 & 0 \\ 5 & -1 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q34"><span class="option-text">\(\begin{bmatrix} 4 & 12 \\ -8 & 0 \\ 20 & -4 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q34"><span class="option-text">\(\begin{bmatrix} 5 & 7 \\ 2 & 4 \\ 9 & 3 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q34"><span class="option-text">\(\begin{bmatrix} 4 & 3 \\ -8 & 0 \\ 20 & -1 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q34"><span class="option-text">\(\begin{bmatrix} 1 & 12 \\ -2 & 0 \\ 5 & -4 \end{bmatrix}\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-34"></div>
+        </div>
+
+        <div class="question-box" data-q="35">
+            <div class="question-text">أوجد ناتج ما يلي:<br>\(5 \begin{bmatrix} -2 & 4 & 1 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q35"><span class="option-text">\(\begin{bmatrix} -10 & 20 & 5 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q35"><span class="option-text">\(\begin{bmatrix} 3 & 9 & 6 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q35"><span class="option-text">\(\begin{bmatrix} -10 & 4 & 1 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q35"><span class="option-text">\(\begin{bmatrix} 10 & -20 & -5 \end{bmatrix}\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-35"></div>
+        </div>
+
+        <div class="question-box" data-q="36">
+            <div class="question-text">أوجد ناتج ما يلي:<br>\(-1 \begin{bmatrix} 7 & -3 \\ -4 & 8 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q36"><span class="option-text">\(\begin{bmatrix} -7 & 3 \\ 4 & -8 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q36"><span class="option-text">\(\begin{bmatrix} 7 & -3 \\ -4 & 8 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q36"><span class="option-text">\(\begin{bmatrix} 6 & -4 \\ -5 & 7 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q36"><span class="option-text">\(\begin{bmatrix} -7 & -3 \\ 4 & 8 \end{bmatrix}\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-36"></div>
+        </div>
+
+        <button class="btn-submit" onclick="checkSection(7, 32, 36)">تحقق من إجابات القسم السابع</button>
+        <button class="btn-review" id="btn-review-7" onclick="showReview(7, 32, 36)">مراجعة الأخطاء وتصحيحها</button>
+        <div class="feedback-box" id="feedback-7"></div>
+    </div>
+
+    <!-- القسم الثامن: قسمة المصفوفة على عدد -->
+    <div class="section-card" id="section-8">
+        <div class="section-title">
+            <span>📌</span> 8. قسمة المصفوفة على عدد
+        </div>
+        
+        <div class="question-box" data-q="37">
+            <div class="question-text">أوجد ناتج ما يلي:<br>\(\frac{\begin{bmatrix} 6 & 9 \\ 3 & 12 \end{bmatrix}}{3} =\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q37"><span class="option-text">\(\begin{bmatrix} 2 & 3 \\ 1 & 4 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q37"><span class="option-text">\(\begin{bmatrix} 3 & 6 \\ 0 & 9 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q37"><span class="option-text">\(\begin{bmatrix} 18 & 27 \\ 9 & 36 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q37"><span class="option-text">\(\begin{bmatrix} 2 & 6 \\ 1 & 9 \end{bmatrix}\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-37"></div>
+        </div>
+
+        <div class="question-box" data-q="38">
+            <div class="question-text">أوجد ناتج ما يلي:<br>\(\frac{\begin{bmatrix} 8 & -4 & 2 \end{bmatrix}}{2} =\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q38"><span class="option-text">\(\begin{bmatrix} 4 & -2 & 1 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q38"><span class="option-text">\(\begin{bmatrix} 10 & -2 & 4 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q38"><span class="option-text">\(\begin{bmatrix} 4 & -4 & 2 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q38"><span class="option-text">\(\begin{bmatrix} 16 & -8 & 4 \end{bmatrix}\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-38"></div>
+        </div>
+
+        <div class="question-box" data-q="39">
+            <div class="question-text">أوجد ناتج ما يلي:<br>\(\frac{\begin{bmatrix} 10 & 5 \\ 15 & 20 \end{bmatrix}}{5} =\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q39"><span class="option-text">\(\begin{bmatrix} 2 & 1 \\ 3 & 4 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q39"><span class="option-text">\(\begin{bmatrix} 5 & 0 \\ 10 & 15 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q39"><span class="option-text">\(\begin{bmatrix} 2 & 5 \\ 3 & 20 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q39"><span class="option-text">\(\begin{bmatrix} 50 & 25 \\ 75 & 100 \end{bmatrix}\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-39"></div>
+        </div>
+
+        <div class="question-box" data-q="40">
+            <div class="question-text">أوجد ناتج ما يلي:<br>\(\frac{\begin{bmatrix} 6 & 12 \\ -9 & 3 \\ 15 & 0 \end{bmatrix}}{3} =\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q40"><span class="option-text">\(\begin{bmatrix} 2 & 4 \\ -3 & 1 \\ 5 & 0 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q40"><span class="option-text">\(\begin{bmatrix} 3 & 9 \\ -6 & 0 \\ 12 & -3 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q40"><span class="option-text">\(\begin{bmatrix} 2 & 9 \\ -3 & 3 \\ 5 & 3 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q40"><span class="option-text">\(\begin{bmatrix} 18 & 36 \\ -27 & 9 \\ 45 & 0 \end{bmatrix}\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-40"></div>
+        </div>
+
+        <div class="question-box" data-q="41">
+            <div class="question-text">أوجد ناتج ما يلي:<br>\(\frac{\begin{bmatrix} 4 & 8 \\ 12 & 16 \end{bmatrix}}{4} =\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q41"><span class="option-text">\(\begin{bmatrix} 1 & 2 \\ 3 & 4 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q41"><span class="option-text">\(\begin{bmatrix} 0 & 4 \\ 8 & 12 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q41"><span class="option-text">\(\begin{bmatrix} 1 & 4 \\ 3 & 4 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q41"><span class="option-text">\(\begin{bmatrix} 16 & 32 \\ 48 & 64 \end{bmatrix}\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-41"></div>
+        </div>
+
+        <button class="btn-submit" onclick="checkSection(8, 37, 41)">تحقق من إجابات القسم الثامن</button>
+        <button class="btn-review" id="btn-review-8" onclick="showReview(8, 37, 41)">مراجعة الأخطاء وتصحيحها</button>
+        <div class="feedback-box" id="feedback-8"></div>
+    </div>
+
+    <!-- القسم التاسع: رتبة المصفوفة الناتجة من ضرب مصفوفتين -->
+    <div class="section-card" id="section-9">
+        <div class="section-title">
+            <span>📌</span> 9. رتبة المصفوفة الناتجة من ضرب مصفوفتين
+        </div>
+        
+        <div class="question-box" data-q="42">
+            <div class="question-text">ما هي رتبة المصفوفة الناتجة من ضرب المصفوفتين التاليتين؟<br>\(E_{2 \times 3} \times B_{2 \times 3}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q42"><span class="option-text">لا يمكن الضرب</span></label>
+                <label class="option-label"><input type="radio" name="q42"><span class="option-text">\(2 \times 3\)</span></label>
+                <label class="option-label"><input type="radio" name="q42"><span class="option-text">\(3 \times 3\)</span></label>
+                <label class="option-label"><input type="radio" name="q42"><span class="option-text">\(2 \times 2\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-42"></div>
+        </div>
+
+        <div class="question-box" data-q="43">
+            <div class="question-text">ما هي رتبة المصفوفة الناتجة من ضرب المصفوفتين التاليتين؟<br>\(A_{3 \times 1} \times B_{2 \times 2}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q43"><span class="option-text">لا يمكن الضرب</span></label>
+                <label class="option-label"><input type="radio" name="q43"><span class="option-text">\(3 \times 2\)</span></label>
+                <label class="option-label"><input type="radio" name="q43"><span class="option-text">\(1 \times 2\)</span></label>
+                <label class="option-label"><input type="radio" name="q43"><span class="option-text">\(3 \times 3\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-43"></div>
+        </div>
+
+        <div class="question-box" data-q="44">
+            <div class="question-text">ما هي رتبة المصفوفة الناتجة من ضرب المصفوفتين التاليتين؟<br>\(C_{2 \times 3} \times D_{3 \times 4}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q44"><span class="option-text">\(2 \times 4\)</span></label>
+                <label class="option-label"><input type="radio" name="q44"><span class="option-text">\(3 \times 3\)</span></label>
+                <label class="option-label"><input type="radio" name="q44"><span class="option-text">\(2 \times 3\)</span></label>
+                <label class="option-label"><input type="radio" name="q44"><span class="option-text">\(4 \times 2\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-44"></div>
+        </div>
+
+        <div class="question-box" data-q="45">
+            <div class="question-text">ما هي رتبة المصفوفة الناتجة من ضرب المصفوفتين التاليتين؟<br>\(P_{3 \times 2} \times Q_{2 \times 1}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q45"><span class="option-text">\(3 \times 1\)</span></label>
+                <label class="option-label"><input type="radio" name="q45"><span class="option-text">\(2 \times 2\)</span></label>
+                <label class="option-label"><input type="radio" name="q45"><span class="option-text">\(3 \times 2\)</span></label>
+                <label class="option-label"><input type="radio" name="q45"><span class="option-text">\(1 \times 3\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-45"></div>
+        </div>
+
+        <div class="question-box" data-q="46">
+            <div class="question-text">ما هي رتبة المصفوفة الناتجة من ضرب المصفوفتين التاليتين؟<br>\(M_{1 \times 3} \times N_{3 \times 1}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q46"><span class="option-text">\(1 \times 1\)</span></label>
+                <label class="option-label"><input type="radio" name="q46"><span class="option-text">\(3 \times 3\)</span></label>
+                <label class="option-label"><input type="radio" name="q46"><span class="option-text">\(1 \times 3\)</span></label>
+                <label class="option-label"><input type="radio" name="q46"><span class="option-text">\(3 \times 1\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-46"></div>
+        </div>
+
+        <button class="btn-submit" onclick="checkSection(9, 42, 46)">تحقق من إجابات القسم التاسع</button>
+        <button class="btn-review" id="btn-review-9" onclick="showReview(9, 42, 46)">مراجعة الأخطاء وتصحيحها</button>
+        <div class="feedback-box" id="feedback-9"></div>
+    </div>
+
+    <!-- القسم العاشر: ضرب المصفوفة في مصفوفة -->
+    <div class="section-card" id="section-10">
+        <div class="section-title">
+            <span>📌</span> 10. ضرب المصفوفة في مصفوفة
+        </div>
+        
+        <div class="question-box" data-q="47">
+            <div class="question-text">أوجد ناتج ضرب المصفوفتين التاليتين:<br>\(\begin{bmatrix} 1 & 2 \\ 3 & 4 \end{bmatrix} \times \begin{bmatrix} 5 & 6 \\ 7 & 8 \\ 9 & 10 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q47"><span class="option-text">لا يمكن الضرب</span></label>
+                <label class="option-label"><input type="radio" name="q47"><span class="option-text">\(\begin{bmatrix} 5 & 12 \\ 24 & 40 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q47"><span class="option-text">\(\begin{bmatrix} 21 & 24 \\ 47 & 54 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q47"><span class="option-text">\(\begin{bmatrix} 6 & 8 \\ 11 & 14 \end{bmatrix}\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-47"></div>
+        </div>
+
+        <div class="question-box" data-q="48">
+            <div class="question-text">أوجد ناتج ضرب المصفوفتين التاليتين:<br>\(\begin{bmatrix} 2 & 1 & 0 \\ 4 & 3 & -1 \end{bmatrix} \times \begin{bmatrix} 1 & 2 \\ 3 & 4 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q48"><span class="option-text">لا يمكن الضرب</span></label>
+                <label class="option-label"><input type="radio" name="q48"><span class="option-text">\(\begin{bmatrix} 5 & 8 \\ -3 & -4 \\ 13 & 20 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q48"><span class="option-text">\(\begin{bmatrix} 2 & 2 \\ 0 & -4 \\ 12 & 12 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q48"><span class="option-text">\(\begin{bmatrix} 1 & 2 \\ 3 & 4 \end{bmatrix}\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-48"></div>
+        </div>
+
+        <div class="question-box" data-q="49">
+            <div class="question-text">أوجد ناتج ضرب المصفوفتين التاليتين:<br>\(\begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix} \times \begin{bmatrix} 2 & 4 & 6 \\ 1 & 3 & 5 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q49"><span class="option-text">\(\begin{bmatrix} 2 & 4 & 6 \\ 1 & 3 & 5 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q49"><span class="option-text">\(\begin{bmatrix} 3 & 7 & 11 \\ 1 & 3 & 5 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q49"><span class="option-text">\(\begin{bmatrix} 2 & 0 \\ 0 & 5 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q49"><span class="option-text">\(\begin{bmatrix} 1 & 1 \\ 1 & 1 \end{bmatrix}\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-49"></div>
+        </div>
+
+        <div class="question-box" data-q="50">
+            <div class="question-text">أوجد ناتج ضرب المصفوفتين التاليتين:<br>\(\begin{bmatrix} 2 & 0 \\ 1 & 3 \end{bmatrix} \times \begin{bmatrix} 1 & 4 \\ 2 & 5 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q50"><span class="option-text">\(\begin{bmatrix} 2 & 8 \\ 7 & 19 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q50"><span class="option-text">\(\begin{bmatrix} 2 & 0 \\ 2 & 15 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q50"><span class="option-text">\(\begin{bmatrix} 1 & 4 \\ 7 & 19 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q50"><span class="option-text">\(\begin{bmatrix} 8 & 2 \\ 19 & 7 \end{bmatrix}\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-50"></div>
+        </div>
+
+        <div class="question-box" data-q="51">
+            <div class="question-text">أوجد ناتج ضرب المصفوفتين التاليتين:<br>\(\begin{bmatrix} 3 & 1 \\ 2 & 0 \end{bmatrix} \times \begin{bmatrix} 2 & 1 \\ 1 & 4 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q51"><span class="option-text">\(\begin{bmatrix} 7 & 7 \\ 4 & 2 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q51"><span class="option-text">\(\begin{bmatrix} 6 & 1 \\ 2 & 0 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q51"><span class="option-text">\(\begin{bmatrix} 7 & 4 \\ 7 & 2 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q51"><span class="option-text">\(\begin{bmatrix} 5 & 5 \\ 3 & 4 \end{bmatrix}\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-51"></div>
+        </div>
+
+        <button class="btn-submit" onclick="checkSection(10, 47, 51)">تحقق من إجابات القسم العاشر</button>
+        <button class="btn-review" id="btn-review-10" onclick="showReview(10, 47, 51)">مراجعة الأخطاء وتصحيحها</button>
+        <div class="feedback-box" id="feedback-10"></div>
+    </div>
+
+    <!-- القسم الحادي عشر: محدد المصفوفة من رتبة 1 في 1 -->
+    <div class="section-card" id="section-11">
+        <div class="section-title">
+            <span>📌</span> 11. محدد المصفوفة (\(1 \times 1\))
+        </div>
+        
+        <div class="question-box" data-q="52">
+            <div class="question-text">أوجد محدد المصفوفة التالية:<br>\(A = \begin{bmatrix} 5 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q52"><span class="option-text">\(5\)</span></label>
+                <label class="option-label"><input type="radio" name="q52"><span class="option-text">\(-5\)</span></label>
+                <label class="option-label"><input type="radio" name="q52"><span class="option-text">\(0\)</span></label>
+                <label class="option-label"><input type="radio" name="q52"><span class="option-text">\(1\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-52"></div>
+        </div>
+
+        <div class="question-box" data-q="53">
+            <div class="question-text">أوجد محدد المصفوفة التالية:<br>\(B = \begin{bmatrix} -7 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q53"><span class="option-text">\(-7\)</span></label>
+                <label class="option-label"><input type="radio" name="q53"><span class="option-text">\(7\)</span></label>
+                <label class="option-label"><input type="radio" name="q53"><span class="option-text">\(0\)</span></label>
+                <label class="option-label"><input type="radio" name="q53"><span class="option-text">\(-1\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-53"></div>
+        </div>
+
+        <div class="question-box" data-q="54">
+            <div class="question-text">أوجد محدد المصفوفة التالية:<br>\(C = \begin{bmatrix} 1.4 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q54"><span class="option-text">\(1.4\)</span></label>
+                <label class="option-label"><input type="radio" name="q54"><span class="option-text">\(-1.4\)</span></label>
+                <label class="option-label"><input type="radio" name="q54"><span class="option-text">\(0\)</span></label>
+                <label class="option-label"><input type="radio" name="q54"><span class="option-text">\(1\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-54"></div>
+        </div>
+
+        <div class="question-box" data-q="55">
+            <div class="question-text">أوجد محدد المصفوفة التالية:<br>\(D = \begin{bmatrix} 2 & 1 & 4 \\ 3 & 0 & 5 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q55"><span class="option-text">لا يمكن إيجاد المحدد</span></label>
+                <label class="option-label"><input type="radio" name="q55"><span class="option-text">\(0\)</span></label>
+                <label class="option-label"><input type="radio" name="q55"><span class="option-text">\(10\)</span></label>
+                <label class="option-label"><input type="radio" name="q55"><span class="option-text">\(-5\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-55"></div>
+        </div>
+
+        <div class="question-box" data-q="56">
+            <div class="question-text">أوجد محدد المصفوفة التالية:<br>\(E = \begin{bmatrix} 1 & 2 \\ 3 & 4 \\ 5 & 6 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q56"><span class="option-text">لا يمكن إيجاد المحدد</span></label>
+                <label class="option-label"><input type="radio" name="q56"><span class="option-text">\(-2\)</span></label>
+                <label class="option-label"><input type="radio" name="q56"><span class="option-text">\(0\)</span></label>
+                <label class="option-label"><input type="radio" name="q56"><span class="option-text">\(6\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-56"></div>
+        </div>
+
+        <button class="btn-submit" onclick="checkSection(11, 52, 56)">تحقق من إجابات القسم الحادي عشر</button>
+        <button class="btn-review" id="btn-review-11" onclick="showReview(11, 52, 56)">مراجعة الأخطاء وتصحيحها</button>
+        <div class="feedback-box" id="feedback-11"></div>
+    </div>
+
+    <!-- القسم الثاني عشر: محدد المصفوفة 2×2 -->
+    <div class="section-card" id="section-12">
+        <div class="section-title">
+            <span>📌</span> 12. محدد المصفوفة (\(2 \times 2\))
+        </div>
+        
+        <div class="question-box" data-q="57">
+            <div class="question-text">أوجد محدد المصفوفة التالية:<br>\(A = \begin{bmatrix} 3 & 2 \\ 1 & 4 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q57"><span class="option-text">\(10\)</span></label>
+                <label class="option-label"><input type="radio" name="q57"><span class="option-text">\(14\)</span></label>
+                <label class="option-label"><input type="radio" name="q57"><span class="option-text">\(12\)</span></label>
+                <label class="option-label"><input type="radio" name="q57"><span class="option-text">\(5\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-57"></div>
+        </div>
+
+        <div class="question-box" data-q="58">
+            <div class="question-text">أوجد محدد المصفوفة التالية:<br>\(B = \begin{bmatrix} 5 & -1 \\ 2 & 3 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q58"><span class="option-text">\(17\)</span></label>
+                <label class="option-label"><input type="radio" name="q58"><span class="option-text">\(13\)</span></label>
+                <label class="option-label"><input type="radio" name="q58"><span class="option-text">\(15\)</span></label>
+                <label class="option-label"><input type="radio" name="q58"><span class="option-text">\(-17\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-58"></div>
+        </div>
+
+        <div class="question-box" data-q="59">
+            <div class="question-text">أوجد محدد المصفوفة التالية:<br>\(C = \begin{bmatrix} 4 & 6 \\ 2 & 3 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q59"><span class="option-text">\(0\)</span></label>
+                <label class="option-label"><input type="radio" name="q59"><span class="option-text">\(24\)</span></label>
+                <label class="option-label"><input type="radio" name="q59"><span class="option-text">\(12\)</span></label>
+                <label class="option-label"><input type="radio" name="q59"><span class="option-text">\(-12\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-59"></div>
+        </div>
+
+        <div class="question-box" data-q="60">
+            <div class="question-text">أوجد محدد المصفوفة التالية:<br>\(D = \begin{bmatrix} -2 & 5 \\ 1 & -3 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q60"><span class="option-text">\(1\)</span></label>
+                <label class="option-label"><input type="radio" name="q60"><span class="option-text">\(-1\)</span></label>
+                <label class="option-label"><input type="radio" name="q60"><span class="option-text">\(11\)</span></label>
+                <label class="option-label"><input type="radio" name="q60"><span class="option-text">\(-11\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-60"></div>
+        </div>
+
+        <div class="question-box" data-q="61">
+            <div class="question-text">أوجد محدد المصفوفة التالية:<br>\(E = \begin{bmatrix} 1 & 4 \\ 3 & 2 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q61"><span class="option-text">\(-10\)</span></label>
+                <label class="option-label"><input type="radio" name="q61"><span class="option-text">\(10\)</span></label>
+                <label class="option-label"><input type="radio" name="q61"><span class="option-text">\(14\)</span></label>
+                <label class="option-label"><input type="radio" name="q61"><span class="option-text">\(-14\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-61"></div>
+        </div>
+
+        <button class="btn-submit" onclick="checkSection(12, 57, 61)">تحقق من إجابات القسم الثاني عشر</button>
+        <button class="btn-review" id="btn-review-12" onclick="showReview(12, 57, 61)">مراجعة الأخطاء وتصحيحها</button>
+        <div class="feedback-box" id="feedback-12"></div>
+    </div>
+
+    <!-- القسم الثالث عشر: محدد المصفوفة 3×3 -->
+    <div class="section-card" id="section-13">
+        <div class="section-title">
+            <span>📌</span> 13. محدد المصفوفة (\(3 \times 3\))
+        </div>
+        
+        <div class="question-box" data-q="62">
+            <div class="question-text">أوجد محدد المصفوفة التالية:<br>\(A = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 2 & 0 \\ 0 & 0 & 3 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q62"><span class="option-text">\(6\)</span></label>
+                <label class="option-label"><input type="radio" name="q62"><span class="option-text">\(0\)</span></label>
+                <label class="option-label"><input type="radio" name="q62"><span class="option-text">\(1\)</span></label>
+                <label class="option-label"><input type="radio" name="q62"><span class="option-text">\(5\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-62"></div>
+        </div>
+
+        <div class="question-box" data-q="63">
+            <div class="question-text">أوجد محدد المصفوفة التالية:<br>\(B = \begin{bmatrix} 2 & 1 & 1 \\ 0 & 3 & 2 \\ 0 & 0 & 4 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q63"><span class="option-text">\(24\)</span></label>
+                <label class="option-label"><input type="radio" name="q63"><span class="option-text">\(12\)</span></label>
+                <label class="option-label"><input type="radio" name="q63"><span class="option-text">\(0\)</span></label>
+                <label class="option-label"><input type="radio" name="q63"><span class="option-text">\(9\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-63"></div>
+        </div>
+
+        <div class="question-box" data-q="64">
+            <div class="question-text">أوجد محدد المصفوفة التالية:<br>\(C = \begin{bmatrix} 1 & 2 & 3 \\ 0 & 1 & 4 \\ 0 & 0 & 1 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q64"><span class="option-text">\(1\)</span></label>
+                <label class="option-label"><input type="radio" name="q64"><span class="option-text">\(0\)</span></label>
+                <label class="option-label"><input type="radio" name="q64"><span class="option-text">\(6\)</span></label>
+                <label class="option-label"><input type="radio" name="q64"><span class="option-text">\(-1\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-64"></div>
+        </div>
+
+        <div class="question-box" data-q="65">
+            <div class="question-text">أوجد محدد المصفوفة التالية:<br>\(D = \begin{bmatrix} 1 & 2 & 3 \\ 1 & 2 & 3 \\ 4 & 5 & 6 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q65"><span class="option-text">\(0\)</span></label>
+                <label class="option-label"><input type="radio" name="q65"><span class="option-text">\(12\)</span></label>
+                <label class="option-label"><input type="radio" name="q65"><span class="option-text">\(-6\)</span></label>
+                <label class="option-label"><input type="radio" name="q65"><span class="option-text">\(24\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-65"></div>
+        </div>
+
+        <div class="question-box" data-q="66">
+            <div class="question-text">أوجد محدد المصفوفة التالية:<br>\(E = \begin{bmatrix} 3 & 0 & 0 \\ 1 & 2 & 0 \\ 4 & 5 & 1 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q66"><span class="option-text">\(6\)</span></label>
+                <label class="option-label"><input type="radio" name="q66"><span class="option-text">\(0\)</span></label>
+                <label class="option-label"><input type="radio" name="q66"><span class="option-text">\(15\)</span></label>
+                <label class="option-label"><input type="radio" name="q66"><span class="option-text">\(30\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-66"></div>
+        </div>
+
+        <button class="btn-submit" onclick="checkSection(13, 62, 66)">تحقق من إجابات القسم الثالث عشر</button>
+        <button class="btn-review" id="btn-review-13" onclick="showReview(13, 62, 66)">مراجعة الأخطاء وتصحيحها</button>
+        <div class="feedback-box" id="feedback-13"></div>
+    </div>
+
+    <!-- القسم الرابع عشر: معكوس المصفوفة -->
+    <div class="section-card" id="section-14">
+        <div class="section-title">
+            <span>📌</span> 14. معكوس المصفوفة
+        </div>
+        
+        <div class="question-box" data-q="67">
+            <div class="question-text">أوجد معكوس المصفوفة التالية:<br>\(A = \begin{bmatrix} 2 & 1 & 4 \\ 3 & 0 & 5 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q67"><span class="option-text">لا يوجد لها معكوس</span></label>
+                <label class="option-label"><input type="radio" name="q67"><span class="option-text">\(\begin{bmatrix} 0 & 3 \\ 1 & 2 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q67"><span class="option-text">\(\begin{bmatrix} \frac{1}{2} & 1 \\ \frac{1}{3} & 0 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q67"><span class="option-text">\(\begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-67"></div>
+        </div>
+
+        <div class="question-box" data-q="68">
+            <div class="question-text">أوجد معكوس المصفوفة التالية:<br>\(B = \begin{bmatrix} 2 & 4 \\ 1 & 2 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q68"><span class="option-text">لا يوجد لها معكوس</span></label>
+                <label class="option-label"><input type="radio" name="q68"><span class="option-text">\(\begin{bmatrix} 2 & -4 \\ -1 & 2 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q68"><span class="option-text">\(\begin{bmatrix} \frac{1}{2} & \frac{1}{4} \\ 1 & \frac{1}{2} \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q68"><span class="option-text">\(\begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}\)</span></label>
+            </div>
+            <div class="explanation-text" id="exp-68"></div>
+        </div>
+
+        <div class="question-box" data-q="69">
+            <div class="question-text">أوجد معكوس المصفوفة التالية:<br>\(C = \begin{bmatrix} 1 & 1 \\ 2 & 3 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q69"><span class="option-text">\(\begin{bmatrix} 3 & -1 \\ -2 & 1 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q69"><span class="option-text">\(\begin{bmatrix} 1 & -1 \\ -2 & 3 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q69"><span class="option-text">\(\begin{bmatrix} -3 & 1 \\ 2 & -1 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q69"><span class="option-text">ليس لها معكوس</span></label>
+            </div>
+            <div class="explanation-text" id="exp-69"></div>
+        </div>
+
+        <div class="question-box" data-q="70">
+            <div class="question-text">أوجد معكوس المصفوفة التالية:<br>\(M = \begin{bmatrix} 2 & 0 \\ 0 & 3 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q70"><span class="option-text">\(\begin{bmatrix} \frac{1}{2} & 0 \\ 0 & \frac{1}{3} \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q70"><span class="option-text">\(\begin{bmatrix} 2 & 0 \\ 0 & 3 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q70"><span class="option-text">\(\begin{bmatrix} -2 & 0 \\ 0 & -3 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q70"><span class="option-text">ليس لها معكوس</span></label>
+            </div>
+            <div class="explanation-text" id="exp-70"></div>
+        </div>
+
+        <div class="question-box" data-q="71">
+            <div class="question-text">أوجد معكوس المصفوفة التالية:<br>\(D = \begin{bmatrix} 2 & 1 \\ 5 & 3 \end{bmatrix}\)</div>
+            <div class="options-list random-options">
+                <label class="option-label" data-is-correct="true"><input type="radio" name="q71"><span class="option-text">\(\begin{bmatrix} 3 & -1 \\ -5 & 2 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q71"><span class="option-text">\(\begin{bmatrix} -3 & 1 \\ 5 & -2 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q71"><span class="option-text">\(\begin{bmatrix} 2 & -1 \\ -5 & 3 \end{bmatrix}\)</span></label>
+                <label class="option-label"><input type="radio" name="q71"><span class="option-text">لا يوجد لها معكوس</span></label>
+            </div>
+            <div class="explanation-text" id="exp-71"></div>
+        </div>
+
+        <button class="btn-submit" onclick="checkSection(14, 67, 71)">تحقق من إجابات القسم الرابع عشر</button>
+        <button class="btn-review" id="btn-review-14" onclick="showReview(14, 67, 71)">مراجعة الأخطاء وتصحيحها</button>
+        <div class="feedback-box" id="feedback-14"></div>
+    </div>
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const letters = ['أ', 'ب', 'ج', 'د'];
+        const optionLists = document.querySelectorAll('.random-options');
+        
+        optionLists.forEach(list => {
+            const items = Array.from(list.children);
+            
+            for (let i = items.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [items[i], items[j]] = [items[j], items[i]];
+            }
+            
+            items.forEach((item, index) => {
+                list.appendChild(item);
+                
+                const radio = item.querySelector('input[type="radio"]');
+                const textSpan = item.querySelector('.option-text');
+                
+                const originalText = textSpan.getAttribute('data-orig-text') || textSpan.innerHTML;
+                if (!textSpan.getAttribute('data-orig-text')) {
+                    textSpan.setAttribute('data-orig-text', originalText);
+                }
+                
+                radio.value = letters[index];
+                textSpan.innerHTML = letters[index] + ') &nbsp;' + originalText;
+                
+                if (item.getAttribute('data-is-correct') === 'true') {
+                    const qBox = item.closest('.question-box');
+                    qBox.setAttribute('data-answer', letters[index]);
+                    
+                    const qId = qBox.getAttribute('data-q');
+                    const expDiv = document.getElementById('exp-' + qId);
+                    if(expDiv) {
+                        expDiv.innerHTML = 'الإجابة الصحيحة هي: ' + letters[index] + ') &nbsp;' + originalText;
+                    }
+                }
+            });
+        });
+
+        // تشغيل MathJax لضمان عرض المصفوفات والرموز الرياضية بدقة
+        if (window.MathJax && window.MathJax.typesetPromise) {
+            window.MathJax.typesetPromise().catch((err) => console.log(err));
+        }
+    });
+
+    const concepts = {
+        1: "أنواع المصفوفات تشمل: المصفوفة الصفية وهي المصفوفة التي تتكون من صف واحد، والمصفوفة العمودية وهي المصفوفة التي تتكون من عمود واحد، والمصفوفة الصفرية وهي التي جميع عناصرها أصفار، والمصفوفة المربعة وهي التي يتساوى فيها عدد الصفوف مع عدد الأعمدة، والمصفوفة القطرية وهي مصفوفة مربعة جميع عناصرها أصفار عدا عناصر القطر الرئيسي فتكون أي عدد، ومصفوفة الوحدة وهي مصفوفة مربعة جميع عناصرها أصفار عدا عناصر القطر الرئيسي فتساوي واحداً.",
+        2: "رتبة المصفوفة هي (عدد الصفوف × عدد الأعمدة)، ودائماً نبدأ بعدد الصفوف.",
+        3: "قيمة العنصر \(a_{mn}\) هو العنصر الذي يقع في المصفوفة A في الصف \(m\) والعمود \(n\).",
+        4: "لكي نقول عن أي مصفوفتين أنهما متساويتين، لابد أن يكون لهما نفس الرتبة، وأيضًا أن تكون العناصر المتناظرة متساوية.",
+        5: "لكي نقوم بجمع المصفوفات، لابد أن يكون لهما نفس الرتبة، وإذا كان لهما نفس الرتبة فنقوم بجمع العناصر المتناظرة.",
+        6: "لكي نقوم بطرح المصفوفات، لابد أن يكون لهما نفس الرتبة، وإذا كان لهما نفس الرتبة، فنقوم بطرح العناصر المتناظرة.",
+        7: "عند ضرب المصفوفة في عدد، فإننا نقوم بضرب هذا العدد في جميع العناصر الموجودة داخل هذه المصفوفة.",
+        8: "عند قسمة المصفوفة على عدد، فإننا نقسم جميع العناصر الموجودة داخل المصفوفة على هذا العدد.",
+        9: "في حالة ضرب المصفوفات، لابد أن تكون أعمدة المصفوفة الأولى تساوي صفوف المصفوفة الثانية. في هذه الحالة يمكن الضرب، وتكون رتبة المصفوفة الناتجة هي عدد الصفوف في الأولى ضرب عدد الأعمدة في الثانية. وفي حال لم يتحقق الشرط، فلا يمكن ضرب المصفوفتين.",
+        10: "لكي نضرب المصفوفات، لابد أن تكون أعمدة المصفوفة الأولى تساوي صفوف المصفوفة الثانية. إذا تحقق الشرط، فإننا نقوم بضرب الصف مع العمود، وإذا لم يتحقق الشرط، فإنه لا يمكن ضرب المصفوفتين.",
+        11: "لكي نوجد محدد المصفوفة، لابد أن تكون المصفوفة مربعة، أي عدد الصفوف يساوي عدد الأعمدة. ولإيجاد محدد المصفوفة من الرتبة 1 × 1، فإنه يكون نفس العنصر الموجود داخل هذه المصفوفة.",
+        12: "لكي نوجد محدد المصفوفة، لابد أن تكون المصفوفة مربعة، أي عدد الصفوف يساوي عدد الأعمدة. ولإيجاد محدد المصفوفة من الرتبة 2 × 2، فإننا نستعمل طريقة المقص، الذي هو عبارة عن (حاصل ضرب عناصر القطر الرئيسي) - (حاصل ضرب عناصر القطر الفرعي).",
+        13: "لإيجاد محدد المصفوفة، لابد أن تكون المصفوفة مربعة، أي أن عدد الصفوف يساوي عدد الأعمدة. ولإيجاد محدد المصفوفة من رتبة 3 × 3، فإننا: أولًا، ننقل العمودين الأول والثاني على يمين المحدد. ثانيًا، نحدد الأقطار الرئيسية (ثلاثة أقطار من أعلى إلى أسفل). ثالثًا، نحدد الأقطار الفرعية (ثلاثة أقطار من أسفل لأعلى). رابعًا، نوجد ناتج ما يلي: (حاصل مجموع ضرب الأقطار الرئيسية) - (حاصل مجموع ضرب الأقطار الفرعية). ولا تنسَ أن هناك عدة طرق لإيجاد محدد المصفوفة من رتبة 3 × 3 غير هذه الطريقة المذكورة.",
+        14: "لإيجاد معكوس المصفوفة، أولًا لابد أن نتاكد من شرطين وهما: أن تكون المصفوفة مربعة، أي أن عدد الصفوف يساوي عدد الأعمدة، والشرط الثاني أن يكون محدد المصفوفة لا يساوي الصفر. فإذا لم تتحقق الشرطين التالية لا يمكن إيجاد معكوس المصفوفة، وإذا تحقق الشرطين فإنه يمكن إيجاد معكوس المصفوفة بحيث نقلب عناصر القطر الرئيسي ونغير إشارات القطر الفرعي، وبعد ذلك نقسم على المحدد."
+    };
+
+    function checkSection(sectionNum, startQ, endQ) {
+        let score = 0;
+        let total = (endQ - startQ) + 1;
+        let answeredAll = true;
+
+        for (let i = startQ; i <= endQ; i++) {
+            const radios = document.getElementsByName('q' + i);
+            let selected = null;
+            for (let r of radios) {
+                if (r.checked) {
+                    selected = r.value;
+                    break;
+                }
+            }
+            if (!selected) {
+                answeredAll = false;
+            } else {
+                const qBox = document.querySelector(`[data-q="${i}"]`);
+                const correctAns = qBox.getAttribute('data-answer');
+                if (selected === correctAns) {
+                    score++;
+                }
+            }
+        }
+
+        const feedbackBox = document.getElementById('feedback-' + sectionNum);
+        const reviewBtn = document.getElementById('btn-review-' + sectionNum);
+        feedbackBox.style.display = 'block';
+
+        if (!answeredAll) {
+            feedbackBox.className = 'feedback-box feedback-error';
+            feedbackBox.innerHTML = `⚠️ يرجى الإجابة على جميع أسئلة هذا القسم أولاً. (نتيجتك الحالية: ${score} من ${total})`;
+            reviewBtn.style.display = 'none';
+            return;
+        }
+
+        if (score === total) {
+            feedbackBox.className = 'feedback-box feedback-success';
+            feedbackBox.innerHTML = `🌟 <strong>بوركت؛ بارك الله في جدك واجتهادك. حصلت على درجة كاملة. أتمنى لك دوام التوفيق والنجاح.</strong> (النتيجة: ${score}/${total})`;
+            reviewBtn.style.display = 'none';
+        } else if (score >= total - 1) {
+            feedbackBox.className = 'feedback-box feedback-warning';
+            feedbackBox.innerHTML = `👍 <strong>ممتاز، أحسنت، مستوى متقدم جداً، وبالاستمرار والاجتهاد ستصل إلى الدرجة الكاملة.</strong> (النتيجة: ${score}/${total})`;
+            reviewBtn.style.display = 'block';
+        } else {
+            feedbackBox.className = 'feedback-box feedback-error';
+            feedbackBox.innerHTML = `
+                ❌ <strong>لا بأس، هناك دائماً مجال للتطور والنمو! نتيجتك ${score}/${total}.</strong><br><br>
+                ${concepts[sectionNum] ? `<strong>مفهوم الدرس:</strong> ${concepts[sectionNum]}<br><br>` : ''}
+                تستطيع الوصول لمستوى أفضل بكثير من خلال:<br>
+                <ol>
+                    <li>مراجعة الدرس.</li>
+                    <li>الاستفادة من فيديوهات الشرح.</li>
+                    <li>سؤال المدرب.</li>
+                </ol>
+            `;
+            reviewBtn.style.display = 'block';
+        }
+    }
+
+    function showReview(sectionNum, startQ, endQ) {
+        for (let i = startQ; i <= endQ; i++) {
+            const qBox = document.querySelector(`[data-q="${i}"]`);
+            const correctAns = qBox.getAttribute('data-answer');
+            const radios = document.getElementsByName('q' + i);
+            let selectedVal = null;
+
+            radios.forEach(r => {
+                if (r.checked) selectedVal = r.value;
+            });
+
+            const labels = qBox.querySelectorAll('.option-label');
+            labels.forEach(label => {
+                const radioInput = label.querySelector('input');
+                const val = radioInput ? radioInput.value : '';
+                label.classList.remove('correct', 'incorrect');
+                if (val === correctAns) {
+                    label.classList.add('correct');
+                } else if (val === selectedVal && selectedVal !== correctAns) {
+                    label.classList.add('incorrect');
+                }
+            });
+
+            if (selectedVal !== correctAns) {
+                document.getElementById('exp-' + i).style.display = 'block';
+            }
+        }
+    }
+</script>
+
+</body>
+</html>
